@@ -1,0 +1,32 @@
+summary: common test plan for CI
+
+
+prepare:
+  - how: shell
+    script:
+     - systemctl disable --now dnf-makecache.service || true
+     - systemctl disable --now dnf-makecache.timer || true
+     - dnf makecache
+
+environment:
+  TANG_IMAGE: "quay.io/sec-eng-special/fedora_tang_server"
+  CI: "true"
+
+discover:
+  how: fmf
+  test:
+   - /Setup/setup_local_cluster
+   - /Setup/install_operator
+   - /Sanity
+   - /Setup/clean_cluster
+
+adjust:
+  - when: distro == rhel-9 or distro == centos-stream-9
+    prepare+:
+      - how: shell
+        script:
+          - dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm https://dl.fedoraproject.org/pub/epel/epel-next-release-latest-9.noarch.rpm
+
+
+execute:
+    how: tmt
