@@ -27,20 +27,13 @@
 ### Global Test Variables
 FUNCTION_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 TIMEOUT_POD_START=120 #seconds
-TIMEOUT_POD_SCALEIN_WAIT=120 #seconds
 TIMEOUT_LEGACY_POD_RUNNING=120 #seconds
-TIMEOUT_DAST_POD_COMPLETED=240 #seconds (DAST lasts around 120 seconds)
 TIMEOUT_POD_STOP=120 #seconds
 TIMEOUT_POD_TERMINATE=120 #seconds
 TIMEOUT_POD_CONTROLLER_TERMINATE=180 #seconds (for controller to end must wait longer)
 TIMEOUT_SERVICE_START=120 #seconds
 TIMEOUT_SERVICE_STOP=120 #seconds
-TIMEOUT_EXTERNAL_IP=120 #seconds
-TIMEOUT_WGET_CONNECTION=10 #seconds
 TIMEOUT_ALL_POD_CONTROLLER_TERMINATE=120 #seconds
-TIMEOUT_KEY_ROTATION=1 #seconds
-TIMEOUT_ACTIVE_KEYS=60 #seconds
-TIMEOUT_HIDDEN_KEYS=60 #seconds
 TIMEOUT_SERVICE_UP=180 #seconds
 OC_DEFAULT_CLIENT="kubectl"
 ATTESTATION_OPERATOR_NAME="attestation-operator"
@@ -81,9 +74,7 @@ echo -e "\nInstall packages required by the script functions when missing."
 rpm -q "${PACKAGES[@]}" || yum -y install "${PACKAGES[@]}"
 
 
-
 ### Functions
-
 logVerbose() {
     if [ "${V}" == "1" ] || [ "${VERBOSE}" == "1" ];
     then
@@ -423,87 +414,6 @@ serviceAdv() {
     return $((wget_res+jq_res))
 }
 
-checkKeyRotation() {
-    local ip=$1
-    local port=$2
-    local namespace=$3
-    local file1
-    file1=$(mktemp)
-    local file2
-    file2=$(mktemp)
-    dumpKeyAdv "${ip}" "${port}" "${file1}"
-    rlRun "${FUNCTION_DIR}/reg_test/func_test/key_rotation/rotate_keys.sh ${namespace} ${OC_CLIENT}" 0 "Rotating keys"
-    rlLog "Waiting:${TO_KEY_ROTATION} secs. for keys to rotate"
-    sleep "${TO_KEY_ROTATION}"
-    dumpKeyAdv "${ip}" "${port}" "${file2}"
-    logVerbose "Comparing files:${file1} and ${file2}"
-    rlAssertDiffer "${file1}" "${file2}"
-    res=$?
-    rm -f "${file1}" "${file2}"
-    return ${res}
-}
-
-dumpKeyAdv() {
-    local ip=$1
-    local port=$2
-    local file=$3
-    test -z "${file}" && file="-"
-    local url
-    url="http://${ip}:${port}/${ADV_PATH}"
-    local get_command1
-    get_command1="wget ${url} --timeout=${TO_WGET_CONNECTION} -O ${file} -o /dev/null"
-    logVerbose "DUMP_KEY_ADV_COMMAND:[${get_command1}]"
-    ${get_command1}
-}
-
-serviceAdvCompare() {
-    local ip=$1
-    local port=$2
-    local ip2=$3
-    local port2=$4
-    local url
-    url="http://${ip}:${port}/${ADV_PATH}"
-    local url2
-    url2="http://${ip2}:${port2}/${ADV_PATH}"
-    local jq_equal=1
-    local file1
-    local file2
-    file1=$(mktemp)
-    file2=$(mktemp)
-    local jq_json_file1
-    local jq_json_file2
-    jq_json_file1=$(mktemp)
-    jq_json_file2=$(mktemp)
-    local command1
-    command1="wget ${url} --timeout=${TO_WGET_CONNECTION} -O ${file1} -o /dev/null"
-    local command2
-    command2="wget ${url2} --timeout=${TO_WGET_CONNECTION} -O ${file2} -o /dev/null"
-    logVerbose "CONNECTION_COMMAND:[${command1}]"
-    logVerbose "CONNECTION_COMMAND:[${command2}]"
-    ${command1}
-    wget_res1=$?
-    ${command2}
-    wget_res2=$?
-    logVerbose "CONNECTION_COMMAND:[${command1}],RESULT:[${wget_res1}],json_adv:[$(cat ${file1})]"
-    logVerbose "CONNECTION_COMMAND:[${command2}],RESULT:[${wget_res2}],json_adv:[$(cat ${file2})]"
-    if [ "${V}" == "1" ] || [ "${VERBOSE}" == "1" ]; then
-        jq . -M -a < "${file1}" 2>&1 | tee "${jq_json_file1}"
-    else
-        jq . -M -a < "${file1}" > "${jq_json_file1}"
-    fi
-    jq_res1=$?
-    if [ "${V}" == "1" ] || [ "${VERBOSE}" == "1" ]; then
-        jq . -M -a < "${file2}" 2>&1 | tee "${jq_json_file2}"
-    else
-        jq . -M -a < "${file2}" > "${jq_json_file2}"
-    fi
-    jq_res2=$?
-    rlAssertDiffer "${jq_json_file1}" "${jq_json_file2}"
-    jq_equal=$?
-    rm "${jq_json_file1}" "${jq_json_file2}"
-    return $((wget_res1+wget_res2+jq_res1+jq_res2+jq_equal))
-}
-
 helmOperatorInstall() {
     if [ "${DISABLE_HELM_INSTALL_TESTS}" == "1" ];
     then
@@ -539,54 +449,6 @@ cleanHelmDistro() {
     fi
     rlRun "helm uninstall ${ATTESTATION_OPERATOR_NAME} --namespace ${ATTESTATION_OPERATOR_NAMESPACE}"
     return 0
-}
-
-getPodCpuRequest() {
-    local pod_name=$1
-    local namespace=$2
-    logVerbose "Getting POD:[${pod_name}](Namespace:[${namespace}]) CPU Request ..."
-    local cpu
-    cpu=$("${OC_CLIENT}" -n "${namespace}" describe pod "${pod_name}" | grep -i Requests -A2 | grep 'cpu' | awk -F ":" '{print $2}' | tr -d ' ' | tr -d "[A-Z,a-z]")
-    logVerbose "CPU REQUEST COMMAND:["${OC_CLIENT}" -n "${namespace}" describe pod ${pod_name} | grep -i Requests -A2 | grep 'cpu' | awk -F ':' '{print $2}' | tr -d ' ' | tr -d \"[A-Z,a-z]\""
-    logVerbose "POD:[${pod_name}](Namespace:[${namespace}]) CPU Request:[${cpu}]"
-    echo "${cpu}"
-}
-
-getPodMemRequest() {
-    local pod_name=$1
-    local namespace=$2
-    logVerbose "Getting POD:[${pod_name}](Namespace:[${namespace}]) MEM Request ..."
-    local mem
-    mem=$("${OC_CLIENT}" -n "${namespace}" describe pod "${pod_name}" | grep -i Requests -A2 | grep 'memory' | awk -F ":" '{print $2}' | tr -d ' ')
-    local unit
-    unit="${mem: -1}"
-    local mult
-    mult=1
-    case "${unit}" in
-        K|k)
-            mult=1024
-            ;;
-        M|m)
-            mult=$((1024*1024))
-            ;;
-        G|g)
-            mult=$((1024*1024*1024))
-            ;;
-        T|t)
-            mult=$((1024*1024*1024*1024))
-            ;;
-        *)
-            mult=1
-            ;;
-    esac
-    logVerbose "MEM REQUEST COMMAND:["${OC_CLIENT}" -n "${namespace}" describe pod ${pod_name} | grep -i Requests -A2 | grep 'memory' | awk -F ':' '{print $2}' | tr -d ' '"
-    logVerbose "POD:[${pod_name}](Namespace:[${namespace}]) MEM Request With Unit:[${mem}] Unit:[${unit}] Mult:[${mult}]"
-    local mem_no_unit
-    mem_no_unit="${mem/${unit}/}"
-    local mult_mem
-    mult_mem=$((mem_no_unit*mult))
-    logVerbose "POD:[${pod_name}](Namespace:[${namespace}]) MEM Request:[${mult_mem}] Unit:[${unit}] Mult:[${mult}]"
-    echo "${mult_mem}"
 }
 
 dumpOpenShiftClientStatus() {
@@ -630,35 +492,4 @@ getVersion() {
     else
         echo "${IMAGE_VERSION}"
     fi
-}
-
-analyzeVersion() {
-    logVerbose "DETECTING MALWARE ON VERSION:[${1}]"
-    "${CONTAINER_MGR}" pull "${1}"
-    user=$(whoami | tr -d ' ' | awk '{print $1}')
-    local tmpdir=$( mktemp -d )
-    if [ "${user}" == "root" ]; then
-        freshclam
-        dir_mount=$(sh "$FUNCTION_DIR"/scripts/mount_image.sh -v "${1}" -c "${CONTAINER_MGR}")
-    else
-        dir_mount=$("${CONTAINER_MGR}" unshare sh "$FUNCTION_DIR"/scripts/mount_image.sh -v "${1}" -c "${CONTAINER_MGR}")
-    fi
-    rlAssertEquals "Checking image could be mounted appropriately" "$?" "0"
-    analyzed_dir=$(echo "${dir_mount}" | sed -e 's@/merged@@g')
-    logVerbose "Analyzing directory:[${analyzed_dir}]"
-    commandVerbose "tree ${analyzed_dir}"
-    prefix=$(echo "${1}" | tr ':' '_' | awk -F "/" '{print $NF}')
-    rlRun "clamscan -o --recursive --infected ${analyzed_dir} --log ${tmpdir}/${prefix}_malware.log" 0 "Checking for malware, logfile:${tmpdir}/${prefix}_malware.log"
-    infected_files=$(grep -i "Infected Files:" "${tmpdir}/${prefix}_malware.log" | awk -F ":" '{print $2}' | tr -d ' ')
-    rlAssertEquals "Checking no infected files" "${infected_files}" "0"
-    if [ "${infected_files}" != "0" ]; then
-        rlLogWarning "${infected_files} Infected Files Detected!"
-        rlLogWarning "Please, review Malware Detection log file: ${tmpdir}/${prefix}_malware.log"
-    fi
-    if [ "${user}" == "root" ]; then
-        sh "$FUNCTION_DIR"/scripts/umount_image.sh -v "${1}" -c "${CONTAINER_MGR}"
-    else
-        "${CONTAINER_MGR}" unshare sh "$FUNCTION_DIR"/scripts/umount_image.sh -v "${1}" -c "${CONTAINER_MGR}"
-    fi
-    rlAssertEquals "Checking image could be umounted appropriately" "$?" "0"
 }
