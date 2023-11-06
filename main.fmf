@@ -1,0 +1,6 @@
+#contact: Sergio Arroutbi <sarroutb@redhat.com>
+
+framework: beakerlib
+require:
+  - type: file
+    pattern: /TestHelpers/.*
