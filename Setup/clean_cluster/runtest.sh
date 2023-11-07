@@ -30,11 +30,11 @@
 
 rlJournalStart
     rlPhaseStartCleanup
-        rlRun ". ../../TestHelpers/functions.sh" || rlDie "cannot import function script"
-        rlRun "checkClusterStatus" 0 "Checking cluster status"
+        rlRun 'rlImport "common-cloud-orchestration/TestHelpers"' || rlDie "cannot import function script"
+        rlRun "ocpopCheckClusterStatus" 0 "Checking cluster status"
         if [ "${DISABLE_BUNDLE_INSTALL_TESTS}" != "1" ] && [ "${DISABLE_BUNDLE_UNINSTALL_TESTS}" != "1" ];
         then
-          rlRun "cleanHelmDistro" 0 "Cleaning installed attestation-operator"
+          rlRun "ocpopCleanHelmDistro" 0 "Cleaning installed attestation-operator"
         fi
     rlPhaseEnd
 rlJournalEnd

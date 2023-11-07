@@ -7,9 +7,10 @@ component:
 test: ./runtest.sh
 tag:
   - CI-Tier-1
+recommend:
+  - helm
 require+:
   - libvirt-daemon
   - podman
-  - helm
 duration: 5m
 enabled: true
