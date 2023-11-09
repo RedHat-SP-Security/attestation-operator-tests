@@ -31,14 +31,14 @@
 rlJournalStart
     ########## DEPLOYMENT TESTS #########
     rlPhaseStartTest "Minimal Deployment"
-        rlRun ". ../../TestHelpers/functions.sh" || rlDie "cannot import function script"
-        rlRun "checkAtLeastPodAmount 3 ${TIMEOUT_POD_START} ${ATTESTATION_OPERATOR_NAMESPACE}" 0 "Checking 3 PODs are started [Timeout=${TIMEOUT_POD_START} secs.]"
-        tenant_pod_name=$(getPodNameWithPartialName "keylime-tenant" "${ATTESTATION_OPERATOR_NAMESPACE}" "${TIMEOUT_POD_START}")
-        rlRun "checkPodState Running ${TIMEOUT_POD_START} ${ATTESTATION_OPERATOR_NAMESPACE} ${tenant_pod_name}" 0 "Checking Tenant POD in Running state [Timeout=${TIMEOUT_POD_START} secs.]"
-        verifier_pod_name=$(getPodNameWithPartialName "keylime-verifier" "${ATTESTATION_OPERATOR_NAMESPACE}" "${TIMEOUT_POD_START}")
-        rlRun "checkPodState Running ${TIMEOUT_POD_START} ${ATTESTATION_OPERATOR_NAMESPACE} ${verifier_pod_name}" 0 "Checking Verifier POD in Running state [Timeout=${TIMEOUT_POD_START} secs.]"
-        registrar_pod_name=$(getPodNameWithPartialName "keylime-registrar" "${ATTESTATION_OPERATOR_NAMESPACE}" "${TIMEOUT_POD_START}")
-        rlRun "checkPodState Running ${TIMEOUT_POD_START} ${ATTESTATION_OPERATOR_NAMESPACE} ${registrar_pod_name}" 0 "Checking Registrar POD in Running state [Timeout=${TIMEOUT_POD_START} secs.]"
+        rlRun 'rlImport "common-cloud-orchestration/TestHelpers"' || rlDie "cannot import function script"
+        rlRun "ocpopCheckAtLeastPodAmount 3 ${TIMEOUT_POD_START} ${OPERATOR_NAMESPACE}" 0 "Checking 3 PODs are started [Timeout=${TIMEOUT_POD_START} secs.]"
+        tenant_pod_name=$(ocpopGetPodNameWithPartialName "keylime-tenant" "${OPERATOR_NAMESPACE}" "${TIMEOUT_POD_START}")
+        rlRun "ocpopCheckPodState Running ${TIMEOUT_POD_START} ${OPERATOR_NAMESPACE} ${tenant_pod_name}" 0 "Checking Tenant POD in Running state [Timeout=${TIMEOUT_POD_START} secs.]"
+        verifier_pod_name=$(ocpopGetPodNameWithPartialName "keylime-verifier" "${OPERATOR_NAMESPACE}" "${TIMEOUT_POD_START}")
+        rlRun "ocpopCheckPodState Running ${TIMEOUT_POD_START} ${OPERATOR_NAMESPACE} ${verifier_pod_name}" 0 "Checking Verifier POD in Running state [Timeout=${TIMEOUT_POD_START} secs.]"
+        registrar_pod_name=$(ocpopGetPodNameWithPartialName "keylime-registrar" "${OPERATOR_NAMESPACE}" "${TIMEOUT_POD_START}")
+        rlRun "ocpopCheckPodState Running ${TIMEOUT_POD_START} ${OPERATOR_NAMESPACE} ${registrar_pod_name}" 0 "Checking Registrar POD in Running state [Timeout=${TIMEOUT_POD_START} secs.]"
     rlPhaseEnd
     ######### /DEPLOYMENT TESTS ########
 

@@ -1,6 +1,6 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-#   Makefile of /CoreOS/tang/Setup/install_operator
+#   Makefile of /CoreOS/attestation-operator-tests/Setup/install_operator
 #   Description: Install attestation-operator
 #   Author: Sergio Arroutbi <sarroutb@redhat.com>
 #

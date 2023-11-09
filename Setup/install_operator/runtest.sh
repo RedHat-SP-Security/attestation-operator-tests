@@ -30,15 +30,15 @@
 
 rlJournalStart
     rlPhaseStartSetup
-        rlRun ". ../../TestHelpers/functions.sh" || rlDie "cannot import function script"
-        dumpDate
-        dumpInfo
+        rlRun 'rlImport "common-cloud-orchestration/TestHelpers"' || rlDie "cannot import"
+        ocpopdumpDate
+        ocpopdumpInfo
         if ! command -v helm &> /dev/null; then
-            rlRun "installHelm"
+            rlRun "ocpopInstallHelm"
         fi
-        rlRun "checkClusterStatus" 0 "Checking cluster status"
+        rlRun "ocpopCheckClusterStatus" 0 "Checking cluster status"
         # In case previous execution was abruptelly stopped:
-        rlRun "initialHelmClean" 0 "Cleaning already installed attestation-operator (if any)"
-        rlRun "helmOperatorInstall" 0 "Installing attestation-operator"
+        rlRun "ocpopInitialHelmClean" 0 "Cleaning already installed attestation-operator (if any)"
+        rlRun "ocpopHelmOperatorInstall" 0 "Installing attestation-operator"
     rlPhaseEnd
 rlJournalEnd
