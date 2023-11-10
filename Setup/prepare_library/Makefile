@@ -22,11 +22,11 @@
 #   along with this program. If not, see http://www.gnu.org/licenses/.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-COMMON_REPOSITORY := $(shell sh -c "grep url ../../main.fmf | grep common | \
-                       sed -e s@' \- url: '@@g" | tr -d ' ')
+COMMON_REPOSITORY:=$(shell sh -c "grep url $(COMMON_REPOSITORY_CLONE_DIR)/main.fmf | grep common | \
+                     sed -e s@' \- url: '@@g" | tr -d ' ')
 COMMON_REPOSITORY_DIR=$(shell echo "$(COMMON_REPOSITORY)" | awk -F '/' '{print $$NF}')
 
 .PHONY: clone
 
 clone:
-	test -d $(COMMON_REPOSITORY_DIR) || git clone $(COMMON_REPOSITORY)
+	test -d $(COMMON_REPOSITORY_CLONE_DIR)/$(COMMON_REPOSITORY_DIR) || git clone $(COMMON_REPOSITORY) $(COMMON_REPOSITORY_CLONE_DIR)/$(COMMON_REPOSITORY_DIR)

@@ -25,9 +25,10 @@
 .PHONY: prepare-library setup sanity clean
 
 all: prepare-library setup sanity clean
+COMMON_REPOSITORY_CLONE_DIR=$(shell pwd)
 
 prepare-library:
-	$(MAKE) -C Setup/prepare_library
+	@COMMON_REPOSITORY_CLONE_DIR=$(COMMON_REPOSITORY_CLONE_DIR) $(MAKE) -C Setup/prepare_library
 
 setup:
 	$(MAKE) -C Setup/install_operator
