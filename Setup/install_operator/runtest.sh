@@ -27,6 +27,7 @@
 
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
+. ../../common-envvars.sh || exit 1
 
 rlJournalStart
     rlPhaseStartSetup
