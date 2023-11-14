@@ -27,7 +27,7 @@
 
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
-
+. ../../common-envvars.sh
 TIMEOUT_POD_KEEPS_RUNNING=10
 
 rlJournalStart
