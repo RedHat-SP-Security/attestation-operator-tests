@@ -1,7 +1,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
 #   Makefile of /CoreOS/attestation-operator-tests/Sanity
-#   Description: Deployment and basic functionality of the tang operator
+#   Description: Deployment and basic functionality of the attestation operator
 #   Author: Patrik Koncity <pkoncity@redhat.com>
 #   Author: Sergio Arroutbi <sarroutb@redhat.com>
 #
