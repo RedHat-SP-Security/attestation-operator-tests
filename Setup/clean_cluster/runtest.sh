@@ -31,9 +31,9 @@
 
 rlJournalStart
     rlPhaseStartCleanup
-        rlRun 'rlImport "common-cloud-orchestration/TestHelpers"' || rlDie "cannot import function script"
-        rlRun "ocpopCheckClusterStatus" 0 "Checking cluster status"
-        rlRun "ocpopCleanHelmDistro" 0 "Cleaning installed attestation-operator"
-        rlRun "ocpopCheckPodAmount 0 ${TIMEOUT_POD_STOP} ${OPERATOR_NAMESPACE}" 0 "Checking no POD continues running [Timeout=${TIMEOUT_POD_STOP} secs.]"
-    rlPhaseEnd
+	rlRun 'rlImport "common-cloud-orchestration/ocpop-lib"' || rlDie "cannot import ocpop lib"
+	rlRun "ocpopCheckClusterStatus" 0 "Checking cluster status"
+	rlRun "ocpopCleanHelmDistro" 0 "Cleaning installed attestation-operator"
+	rlRun "ocpopCheckPodAmount 0 ${TO_POD_STOP} ${OPERATOR_NAMESPACE}" 0 "Checking no POD continues running [Timeout=${TO_POD_STOP} secs.]"
+   rlPhaseEnd
 rlJournalEnd

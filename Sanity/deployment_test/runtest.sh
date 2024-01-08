@@ -28,30 +28,30 @@
 # Include Beaker environment
 . /usr/share/beakerlib/beakerlib.sh || exit 1
 . ../../common-envvars.sh
-TIMEOUT_POD_KEEPS_RUNNING=10
+TO_POD_KEEPS_RUNNING=10
 
 rlJournalStart
-    ########## DEPLOYMENT TESTS #########
-    rlPhaseStartTest "Minimal Deployment"
-        rlRun 'rlImport "common-cloud-orchestration/TestHelpers"' || rlDie "cannot import function script"
-        rlRun "ocpopCheckAtLeastPodAmount 3 ${TIMEOUT_POD_START} ${OPERATOR_NAMESPACE}" 0 "Checking 3 PODs are started [Timeout=${TIMEOUT_POD_START} secs.]"
-        tenant_pod_name=$(ocpopGetPodNameWithPartialName "keylime-tenant" "${OPERATOR_NAMESPACE}" "${TIMEOUT_POD_START}")
-        rlRun "ocpopCheckPodState Running ${TIMEOUT_POD_START} ${OPERATOR_NAMESPACE} ${tenant_pod_name} Error" 0 \
-              "Checking Tenant POD in Running state [Timeout=${TIMEOUT_POD_START} secs.]"
-        rlRun "ocpopCheckPodStateAndContinues Running ${TIMEOUT_POD_KEEPS_RUNNING} ${OPERATOR_NAMESPACE} ${tenant_pod_name}" 0 \
-              "Checking Tenant POD in Running state during ${TIMEOUT_POD_KEEPS_RUNNING} secs."
-        verifier_pod_name=$(ocpopGetPodNameWithPartialName "keylime-verifier" "${OPERATOR_NAMESPACE}" "${TIMEOUT_POD_START}")
-        rlRun "ocpopCheckPodState Running ${TIMEOUT_POD_START} ${OPERATOR_NAMESPACE} ${verifier_pod_name} Error" 0 \
-              "Checking Verifier POD in Running state [Timeout=${TIMEOUT_POD_START} secs.]"
-        rlRun "ocpopCheckPodStateAndContinues Running ${TIMEOUT_POD_KEEPS_RUNNING} ${OPERATOR_NAMESPACE} ${verifier_pod_name}" 0 \
-              "Checking Verifier POD in Running state during ${TIMEOUT_POD_KEEPS_RUNNING} secs."
-        registrar_pod_name=$(ocpopGetPodNameWithPartialName "keylime-registrar" "${OPERATOR_NAMESPACE}" "${TIMEOUT_POD_START}")
-        rlRun "ocpopCheckPodState Running ${TIMEOUT_POD_START} ${OPERATOR_NAMESPACE} ${registrar_pod_name} Error" 0 \
-              "Checking Registrar POD in Running state [Timeout=${TIMEOUT_POD_START} secs.]"
-        rlRun "ocpopCheckPodStateAndContinues Running ${TIMEOUT_POD_KEEPS_RUNNING} ${OPERATOR_NAMESPACE} ${registrar_pod_name}" 0 \
-              "Checking Registrar POD in Running state during ${TIMEOUT_POD_KEEPS_RUNNING} secs."
-    rlPhaseEnd
-    ######### /DEPLOYMENT TESTS ########
+      ########## DEPLOYMENT TESTS #########
+      rlPhaseStartTest "Minimal Deployment"
+            rlRun 'rlImport "common-cloud-orchestration/ocpop-lib"' || rlDie "cannot import ocpop lib"
+            rlRun "ocpopCheckAtLeastPodAmount 3 ${TO_POD_START} ${OPERATOR_NAMESPACE}" 0 "Checking 3 PODs are started [Timeout=${TO_POD_START} secs.]"
+            tenant_pod_name=$(ocpopGetPodNameWithPartialName "keylime-tenant" "${OPERATOR_NAMESPACE}" "${TO_POD_START}")
+            rlRun "ocpopCheckPodState Running ${TO_POD_START} ${OPERATOR_NAMESPACE} ${tenant_pod_name} Error" 0 \
+            "Checking Tenant POD in Running state [Timeout=${TO_POD_START} secs.]"
+            rlRun "ocpopCheckPodStateAndContinues Running ${TO_POD_KEEPS_RUNNING} ${OPERATOR_NAMESPACE} ${tenant_pod_name}" 0 \
+            "Checking Tenant POD in Running state during ${TO_POD_KEEPS_RUNNING} secs."
+            verifier_pod_name=$(ocpopGetPodNameWithPartialName "keylime-verifier" "${OPERATOR_NAMESPACE}" "${TO_POD_START}")
+            rlRun "ocpopCheckPodState Running ${TO_POD_START} ${OPERATOR_NAMESPACE} ${verifier_pod_name} Error" 0 \
+            "Checking Verifier POD in Running state [Timeout=${TO_POD_START} secs.]"
+            rlRun "ocpopCheckPodStateAndContinues Running ${TO_POD_KEEPS_RUNNING} ${OPERATOR_NAMESPACE} ${verifier_pod_name}" 0 \
+            "Checking Verifier POD in Running state during ${TO_POD_KEEPS_RUNNING} secs."
+            registrar_pod_name=$(ocpopGetPodNameWithPartialName "keylime-registrar" "${OPERATOR_NAMESPACE}" "${TO_POD_START}")
+            rlRun "ocpopCheckPodState Running ${TO_POD_START} ${OPERATOR_NAMESPACE} ${registrar_pod_name} Error" 0 \
+            "Checking Registrar POD in Running state [Timeout=${TO_POD_START} secs.]"
+            rlRun "ocpopCheckPodStateAndContinues Running ${TO_POD_KEEPS_RUNNING} ${OPERATOR_NAMESPACE} ${registrar_pod_name}" 0 \
+            "Checking Registrar POD in Running state during ${TO_POD_KEEPS_RUNNING} secs."
+      rlPhaseEnd
+      ######### /DEPLOYMENT TESTS ########
 
 rlJournalPrintText
 rlJournalEnd

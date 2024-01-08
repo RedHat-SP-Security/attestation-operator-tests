@@ -31,7 +31,7 @@
 
 rlJournalStart
     rlPhaseStartSetup
-        rlRun 'rlImport "common-cloud-orchestration/TestHelpers"' || rlDie "cannot import"
+        rlRun 'rlImport "common-cloud-orchestration/ocpop-lib"' || rlDie "cannot import ocpop lib"
         rlRun "ocpopDumpDate" 0 "Dumping Date"
         rlRun "ocpopDumpInfo" 0 "Dumping Execution Information"
         if ! command -v helm &> /dev/null; then
