@@ -33,8 +33,8 @@ TIMEOUT_POD_KEEPS_RUNNING=10
 rlJournalStart
     ########## DEPLOYMENT TESTS #########
     rlPhaseStartTest "Minimal Deployment"
-        rlRun 'rlImport "common-cloud-orchestration/TestHelpers"' || rlDie "cannot import function script"
-        rlRun "ocpopCheckAtLeastPodAmount 3 ${TIMEOUT_POD_START} ${OPERATOR_NAMESPACE}" 0 "Checking 3 PODs are started [Timeout=${TIMEOUT_POD_START} secs.]"
+        rlRun 'rlImport "common-cloud-orchestration/ocpop-lib"' || rlDie "cannot import ocpop lib"
+    	rlRun "ocpopCheckAtLeastPodAmount 3 ${TIMEOUT_POD_START} ${OPERATOR_NAMESPACE}" 0 "Checking 3 PODs are started [Timeout=${TIMEOUT_POD_START} secs.]"
         tenant_pod_name=$(ocpopGetPodNameWithPartialName "keylime-tenant" "${OPERATOR_NAMESPACE}" "${TIMEOUT_POD_START}")
         rlRun "ocpopCheckPodState Running ${TIMEOUT_POD_START} ${OPERATOR_NAMESPACE} ${tenant_pod_name} Error" 0 \
               "Checking Tenant POD in Running state [Timeout=${TIMEOUT_POD_START} secs.]"
