@@ -4,4 +4,4 @@ framework: beakerlib
 require:
   - url: https://github.com/RedHat-SP-Security/common-cloud-orchestration
     ref: main
-    name: /TestHelpers
+    name: /ocpop-lib
