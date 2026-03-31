@@ -1,0 +1,23 @@
+summary: Scale test of attestation operator
+description: ''
+contact: Sergio Arroutbi <sarroutb@redhat.com>
+component:
+  - attestation-operator
+test: ./runtest.sh
+recommend:
+  - attestation-operator
+duration: 5m
+enabled: true
+tag:
+  - NoRHEL6
+  - NoRHEL7
+  - NoRHEL8
+  - Tier3
+tier: '3'
+adjust:
+  - enabled: false
+    when: distro < rhel-9
+    continue: false
+  - enabled: false
+    when: distro == rhel-alt-7
+    continue: false
