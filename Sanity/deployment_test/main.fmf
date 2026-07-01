@@ -1,5 +1,5 @@
 summary: Deployment test of attestation operator
-description: ''
+description: Verify that the attestation operator deploys successfully by checking that the keylime-tenant, keylime-verifier, and keylime-registrar pods start, reach the Running state, and remain running.
 contact: Sergio Arroutbi <sarroutb@redhat.com>
 component:
   - attestation-operator
